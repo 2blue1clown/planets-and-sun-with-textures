@@ -2,39 +2,62 @@ import * as THREE from "three";
 
 // Definitions
 interface Textures {
-  color: THREE.Texture;
-  displacement: THREE.Texture;
-  normal: THREE.Texture;
-  ambientOcclusion: THREE.Texture;
-  metalness: THREE.Texture;
-  roughness: THREE.Texture;
+  color?: THREE.Texture;
+  displacement?: THREE.Texture;
+  normal?: THREE.Texture;
+  ambientOcclusion?: THREE.Texture;
+  metalness?: THREE.Texture;
+  roughness?: THREE.Texture;
+  emission?: THREE.Texture;
+}
+
+interface LoadTextureFlags{
+  color?: boolean;
+  displacement?: boolean;
+  normal?: boolean;
+  ambientOcclusion?: boolean;
+  metalness?: boolean;
+  roughness?: boolean;
+  emission?: boolean;
+
 }
 
 //Functions
-const loadTexture = (folderPath:string) : Textures=> {
+const onError = (texture: THREE.Texture) => {
+  texture.dispose()
+  console.log(texture)
+  console.error("Error loading texture");
+
+}
+
+const loadTextures = (folderPath:string) : Textures=> {
   const textureLoader = new THREE.TextureLoader();
   const color =  textureLoader.load(folderPath + "/color.jpg");
   color.colorSpace = THREE.SRGBColorSpace;
   const displacement = textureLoader.load(folderPath + "/displacement.jpg");
   const normal = textureLoader.load(folderPath + "/normalGL.jpg");
   const ambientOcclusion = textureLoader.load(folderPath + "/ambientOcclusion.jpg");
-  const metalness = textureLoader.load(folderPath + "/metalness.jpg");
+  const metalness = textureLoader.load(folderPath + "/metalness.jpg",);
   const roughness = textureLoader.load(folderPath + "/roughness.jpg");
+  const emission = textureLoader.load(folderPath + "/emission.jpg");
+  console.log(folderPath,emission)
   return {
     color,
     displacement,
     normal,
     ambientOcclusion,
     metalness,
-    roughness
+    roughness,
+    emission
   }
 }
-//Objects
 const makeSimpleTexturedSphere = (
   position: THREE.Vector3 = new THREE.Vector3(0, 0, 0),
   size: number = 1,
   textures: Textures,
-  displacementScale: number = 0.1
+  displacementScale: number = 0.1,
+  flags:LoadTextureFlags,
+  color?: string,
 ) => {
   const geometry = new THREE.SphereGeometry(size, 32, 32);
   const material = new THREE.MeshStandardMaterial({
@@ -42,11 +65,23 @@ const makeSimpleTexturedSphere = (
     displacementMap: textures.displacement,
     displacementScale,
     normalMap: textures.normal,
-    aoMap: textures.ambientOcclusion,
-    metalnessMap: textures.metalness,
-    roughnessMap: textures.roughness,
   });
   material.displacementScale = displacementScale;
+  if (color) {
+    material.color = new THREE.Color(color);
+  }
+  if(flags.ambientOcclusion){
+    material.aoMap = textures.ambientOcclusion || null
+  }
+  if(flags.metalness){
+    material.metalnessMap = textures.metalness || null
+  }
+  if(flags.roughness){
+    material.roughnessMap = textures.roughness || null
+  }
+  if(flags.emission){
+    material.emissiveMap = textures.emission || null
+  }
 
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.copy(position);
@@ -63,32 +98,38 @@ const scene = new THREE.Scene();
 //Lights
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
-const pointLight = new THREE.PointLight(0xffffff, 30);
-pointLight.position.set(0, 0, 0);
+const pointLight = new THREE.PointLight(0xffffff, 9);
+pointLight.position.set(0,0,0);
 scene.add(pointLight);
 
 //Load Texture
-const rock051Textures = loadTexture("/textures/rock051");
+const rock051Textures = loadTextures("/textures/rock051");
+const rock051Flags = {color:true,displacement:true,normal:true,ambientOcclusion:true,metalness:true,roughness:true,emission:false}
+const lava004Textures = loadTextures("/textures/lava004");
+const lava004Flags = {color:true,displacement:true,normal:true,ambientOcclusion:false,metalness:false,roughness:true,emission:true}
 
+//Instantiate objects
 const sun = makeSimpleTexturedSphere(
   new THREE.Vector3(0, 0, 0),
   2,
-  rock051Textures,
-  0.8
+  lava004Textures,
+  0.3,
+  lava004Flags,
+  "orange"
 );
 const planet = makeSimpleTexturedSphere(
   new THREE.Vector3(1, 0, 0),
   0.3,
   rock051Textures,
-  0.5
-);
+  0.5,
+rock051Flags);
 const moon = makeSimpleTexturedSphere(
   new THREE.Vector3(1, 0, 0),
   0.05,
   rock051Textures,
+  undefined,
+rock051Flags
 );
-
-// const moon = makeSimpleCube(new THREE.Vector3(1, 0, 0), 0.25, 0x0000ff);
 
 // Sizes
 const sizes = {
