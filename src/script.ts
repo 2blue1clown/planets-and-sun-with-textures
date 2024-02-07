@@ -36,6 +36,8 @@ const makeSimpleTexturedSphere = (
   colorTexture: THREE.Texture,
   ambientOcclusionTexture: THREE.Texture,
   normalTexture: THREE.Texture,
+  roughnessTexture: THREE.Texture,
+  metalnessTexture: THREE.Texture,
   displacementTexture: THREE.Texture,
   displacementScale: number = 0.1
 ) => {
@@ -46,6 +48,8 @@ const makeSimpleTexturedSphere = (
     aoMap: ambientOcclusionTexture,
     normalMap: normalTexture,
     displacementMap: displacementTexture,
+    metalnessMap: metalnessTexture,
+    // roughnessMap: roughnessTexture,
   });
   material.displacementScale = displacementScale;
 
@@ -62,6 +66,8 @@ const sun = makeSimpleTexturedSphere(
   colorTexture,
   ambientOcclusionTexture,
   normalTexture,
+  metalnessTexture,
+  roughnessTexture,
   displacementTexture,
   0.8
 );
@@ -71,6 +77,8 @@ const planet = makeSimpleTexturedSphere(
   colorTexture,
   ambientOcclusionTexture,
   normalTexture,
+  metalnessTexture,
+  roughnessTexture,
   displacementTexture,
   0.5
 );
@@ -80,6 +88,8 @@ const moon = makeSimpleTexturedSphere(
   colorTexture,
   ambientOcclusionTexture,
   normalTexture,
+  metalnessTexture,
+  roughnessTexture,
   displacementTexture
 );
 
