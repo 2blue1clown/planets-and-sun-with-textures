@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@types/three": "^0.161.2",
-    "three": "^0.158.0"
+    "three": "^0.158.0",
+    "typescript": "^5.3.3"
   }
 }
