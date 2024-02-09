@@ -22,13 +22,6 @@ interface LoadTextureFlags{
 
 }
 
-//Functions
-const onError = (texture: THREE.Texture) => {
-  texture.dispose()
-  console.log(texture)
-  console.error("Error loading texture");
-
-}
 
 const loadTextures = (folderPath:string) : Textures=> {
   const textureLoader = new THREE.TextureLoader();
@@ -133,14 +126,28 @@ rock051Flags
 
 // Sizes
 const sizes = {
-  width: 800,
-  height: 600,
+  width: window.innerWidth,
+  height: window.innerHeight,
 };
 
 // Camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
 camera.position.z = 10;
 scene.add(camera);
+
+window.addEventListener('resize', () =>
+{
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+})
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({
